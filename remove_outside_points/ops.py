@@ -26,26 +26,37 @@ def lidar_to_camera(points, r_rect, velo2cam):
     camera_points = points @ (r_rect @ velo2cam).T
     return camera_points[..., :3]
 
+def roty(angles):
+    rot_sin = np.sin(angles)
+    rot_cos = np.cos(angles)
+    ones = np.ones_like(rot_cos)
+    zeros = np.zeros_like(rot_cos)
 
-def label_to_lidar_3dbox(whl,loc,rect,Trv2c):
+    rot_mat_T = np.stack([[rot_cos, zeros, -rot_sin], [zeros, ones, zeros],
+                              [rot_sin, zeros, rot_cos]])
+    return rot_mat_T
+
+
+def label_to_lidar_3dbox(whl,loc,rect,Trv2c,ry):
     """
-             w           #  [-l/2., -h., -w/2.],
-      8———————+——————7   #  [-l/2., -h.,  w/2.], 
-     /.            / |   #  [-l/2.,  0.,  w/2.],
-    / .           /  |   #  [-l/2.,  0., -w/2.],
-   +  . Center   +   |   #  [ l/2., -h., -w/2.],
-  /   5-------- /----6   #  [ l/2., -h.,  w/2.],
- /    /        /    /    #  [ l/2.,  0.,  w/2.],
-4——-———+——————3    /     #  [ l/2.,  0., -w/2.], 
-|   /         |   / l
-|  /       -h |  /
-| /           | /
-1—————————————2
-      w
-"""
+                     w       #1  [-w/2., -h., -l/2.],
+          8———————+——————7   #2  [-w/2., -h.,  l/2.], 
+         /.            / |   #3  [-w/2.,  0.,  l/2.],
+        / .           /  |   #4  [-w/2.,  0., -l/2.],
+       +  . Center   +   |   #5  [ w/2., -h., -l/2.],
+      /   5-------- /----6   #6  [ w/2., -h.,  l/2.],
+     /    /        /    /    #7  [ w/2.,  0.,  l/2.],
+    4——-———+——————3    /     #8  [ w/2.,  0., -l/2.], 
+    |   /         |   / l
+    |  /       -h |  /
+    | /           | /
+    1—————————————2
+          w
+
+    """
 
     #kitti format dimensions is whl, need convert to  whl
-    lhw = whl[:,[2,1,0]] # (N,3)
+
     conrners_norm  = np.array([[0., 0., 0.],    # 0 0 0
                                [0., 0., 1.],    # 0 0 w
                                [0., 1., 1.],    # 0 h w 
@@ -58,7 +69,7 @@ def label_to_lidar_3dbox(whl,loc,rect,Trv2c):
     corners[:,:,0] -= lhw[:,0].reshape(-1,1)/2
     corners[:,:,1] -= lhw[:,1].reshape(-1,1)
     corners[:,:,2] -= lhw[:,2].reshape(-1,1)/2
-
+    corners = np.einsum('aij,jka->aik', corners, roty(ry) 
     corners += loc.reshape(-1,1,3)
     return camera_to_lidar(corners,rect,Trv2c)
 

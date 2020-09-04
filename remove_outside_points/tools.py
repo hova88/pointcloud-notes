@@ -11,7 +11,8 @@ def remove_outside_point():
     points,p2,rect,Trv2c,image_shape,annos = load()
     whl = annos['dimensions']
     loc = annos['location']
-    corners = ops.label_to_lidar_3dbox(whl,loc,rect,Trv2c)
+    ry  = annos['rotation_y'] # yaw angle (around Y-axis in camera coordinates) [-pi..pi]
+    corners = ops.label_to_lidar_3dbox(whl,loc,rect,Trv2c,ry)
 
     #make sure all in velo coords
     surfaces = ops.corner_to_surfaces_3d(corners)

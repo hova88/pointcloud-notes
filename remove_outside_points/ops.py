@@ -65,10 +65,10 @@ def label_to_lidar_3dbox(whl,loc,rect,Trv2c,ry):
                                [1., 0., 1.],    # l 0 w
                                [1., 1., 1.],    # l h w 
                                [1., 1., 0.]])   # l h 0 
-    corners = lhw.reshape(-1,1,3) * conrners_norm.reshape(1,-1,3)
-    corners[:,:,0] -= lhw[:,0].reshape(-1,1)/2
-    corners[:,:,1] -= lhw[:,1].reshape(-1,1)
-    corners[:,:,2] -= lhw[:,2].reshape(-1,1)/2
+    corners = whl.reshape(-1,1,3) * conrners_norm.reshape(1,-1,3)
+    corners[:,:,0] -= whl[:,0].reshape(-1,1)/2
+    corners[:,:,1] -= whl[:,1].reshape(-1,1)
+    corners[:,:,2] -= whl[:,2].reshape(-1,1)/2
     corners = np.einsum('aij,jka->aik', corners, roty(ry) 
     corners += loc.reshape(-1,1,3)
     return camera_to_lidar(corners,rect,Trv2c)

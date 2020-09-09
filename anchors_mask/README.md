@@ -118,3 +118,17 @@ def image_box_region_area(img_cumsum, bbox):
 ```python
 python demo.py
 ```
+
+# Performance
+```
+    # anchor_mask took 273.84138107299805 ms
+    # anchor_mask took 1.6858577728271484 ms
+    # anchor_mask took 1.6162395477294922 ms
+    # anchor_mask took 1.8193721771240234 ms
+    # anchor_mask took 1.4204978942871094 ms
+    # anchor_mask took 1.417398452758789 ms
+    # anchor_mask took 1.417398452758789 ms
+    # anchor_mask took 1.4157295227050781 ms
+    # anchor_mask took 1.5590190887451172 ms
+    # anchor_mask took 1.4972686767578125 ms
+```
